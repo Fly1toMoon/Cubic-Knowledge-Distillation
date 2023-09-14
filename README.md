@@ -1,12 +1,10 @@
 # Cubic-Knowledge-Distillation
-Code for 'Cubic Knowledge Distillation for Speech Emotion Recognition'
 
-# Abstract
-Speech Emotion Recognition (SER) can play an important role in human-computer interaction. In this paper, we propose a logit knowledge distillation method for SER, called Cubic KD, that distill the knowledge of fine-tuned self-supervised models to allow better performance of small models. By creating cubic structures from teacher and student network output features and using a loss function to distill the cube structure through self-correlation between elements, Cubic KD efficiently captures knowledge within instances and among instances. We apply this distillation method to four student models and conduct experiments using the Emo-DB and IEMOCAP datasets. The results show that Cubic KD outperforms existing predictive logit knowledge distillation methods and is comparable to intermediate feature knowledge distillation methods.
+Speech Emotion Recognition (SER) can play an important role in human-computer interaction. We propose a logit knowledge distillation method for SER, called Cubic KD, that distill the knowledge of fine-tuned self-supervised models to allow better performance of small models. By creating cubic structures from teacher and student network output features and using a loss function to distill the cube structure through self-correlation between elements, Cubic KD efficiently captures knowledge within instances and among instances. We apply this distillation method to four student models and conduct experiments using the Emo-DB and IEMOCAP datasets. The results show that Cubic KD outperforms existing predictive logit knowledge distillation methods and is comparable to intermediate feature knowledge distillation methods.
 
 ![figkd_page-0001-2](https://github.com/Fly1toMoon/Cubic-Knowledge-Distillation/assets/87889196/6f6730d0-5cce-489b-8476-d67fa6721e2a)
 
-# Installation and Training
+## Installation and Training
 ### 1. Requirements:
 You need to install packages necessary for running experiments. Please run the following command.
 ```sh
@@ -65,6 +63,6 @@ python train_cnn.py -session 1 \
                     -len 200000
 ```
 
-# Results:
+## Results:
 We use Light-SERNet+, MobileNetV3, EfficientNetB0, ResNet18 as student models, WavLM Base+ as teacher model, and the experimental results on Emo-DB and IEMOCAP datasets are as follows：
 <img width="1167" alt="截屏2023-09-14 17 28 21" src="https://github.com/Fly1toMoon/Cubic-Knowledge-Distillation/assets/87889196/4236b289-fa0e-41a8-b5c7-412e49e86ee0">
