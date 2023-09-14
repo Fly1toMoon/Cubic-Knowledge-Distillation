@@ -3,33 +3,24 @@ import numpy as np
 import torch.nn as nn
 import torch.nn.functional as F
 import matplotlib.pyplot as plt
-import seaborn as sns
 import pandas as pd
 import random
-import wandb
 import timm
 import argparse
 
-import librosa
-import librosa.display
-import torchaudio.transforms as transforms
-import torchvision.models as models
-# from torchstat import stat
-
-from dis0 import distillWavLM, SERwithWavLM
+from sklearn.model_selection import train_test_split, StratifiedKFold, KFold
+from statistics import mean
 from torch.utils.data import random_split, DataLoader, SubsetRandomSampler, Dataset
-from dataset import IEMOCAPDataset, Collator
-from transformers import WavLMModel, WavLMConfig, Wav2Vec2FeatureExtractor #, WavLMForCTC
+from transformers import Wav2Vec2FeatureExtractor 
 from tqdm import tqdm
 
+from dataset import IEMOCAPDataset, Collator
 from distillers.CKD import CKDLoss
 from distillers.DKD import DKDLoss
 from distillers.RKD import RKDLoss
 from distillers.KD import KDLoss
 from distillers.pure import PureLoss
 
-from sklearn.model_selection import train_test_split, StratifiedKFold, KFold
-from statistics import mean
 
 def torch_fix_seed(seed=42):
     # Python random
@@ -56,6 +47,11 @@ ap.add_argument("-model", "--stu_model",
                 default="mobilenetv3_small_075",
                 type=str,
                 help="name of student model")
+
+ap.add_argument("-kd", "--kd_type",  
+                default="pure",
+                type=str,
+                help="kd_type")
 
 ap.add_argument("-input", "--input_type",  
                 default="mel",
@@ -96,12 +92,13 @@ args = vars(ap.parse_args())
 
 test_session = args["test_session"]
 stu_model = args["stu_model"]
+kd_type = args["kd_type"]
 input_type = args["input_type"]
 lr = args["learning_rate"]
 batch_size = args["batch_size"]
 epoc_nums = args["epoc_nums"]
-lambda_l1 = args["lambda_l1"]
-lambda_l2 = args["lambda_l2"]
+lambda_1 = args["lambda_1"]
+lambda_2 = args["lambda_2"]
 input_length = args["input_length"]
 
 
@@ -111,13 +108,16 @@ sample_rate = 16000
 num_epochs = epoc_nums
 learning_rate = lr
 pretrained_model = "microsoft/wavlm-base-plus"
+num_labels = 4
 
 extractor = Wav2Vec2FeatureExtractor.from_pretrained('superb/wav2vec2-base-superb-er') # for ER
 teacher_predictions_by_path = torch.load("./tea_output/tea_preds_by_path.pth")
 
+# Your IEMOCAP dataset path here
+data_path = ''
 
-train_dataset = IEMOCAPDataset(fold_num=test_session, split='train')
-test_dataset = IEMOCAPDataset(fold_num=test_session, split='test')
+train_dataset = IEMOCAPDataset(root=data_path, fold_num=test_session, split='train')
+test_dataset = IEMOCAPDataset(root=data_path, fold_num=test_session, split='test')
 
 print('*'*50)
 print("test_session : ", test_session)

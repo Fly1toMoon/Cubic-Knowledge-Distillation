@@ -1,5 +1,5 @@
 from pathlib import Path
-
+import os
 import librosa
 import pandas as pd
 import torch
@@ -9,19 +9,22 @@ from torch.utils.data import Dataset
 SAMPLE_RATE = 16000
 
 metadata_dir = Path(
-    '')
+    './s3prl_split')
+
 
 
 class IEMOCAPDataset(Dataset):
-    def __init__(self, fold_num=1, split='train', pre_load=True):
+    def __init__(self, root='', fold_num=1, split='train', pre_load=True):
         metadata_path = metadata_dir / \
             f'Session{fold_num}' / f'{split}_meta_data.csv'
+        self.root = root
         self.df = pd.read_csv(metadata_path)
         self.class_num = len(np.unique(self.df['label'].values))
 
     def __getitem__(self, idx):
         data = self.df.loc[idx]
-        waveform, _ = librosa.load(data['path'], sr=SAMPLE_RATE)
+        audio_path = os.path.join(self.root, data['path'])
+        waveform, _ = librosa.load(audio_path, sr=SAMPLE_RATE)
         return {'waveform': waveform,
                 'emotion': data['label'],
                 'path': data['path']}

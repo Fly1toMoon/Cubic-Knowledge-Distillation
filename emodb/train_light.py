@@ -100,7 +100,7 @@ num_labels = 7
 
 
 # Your data_dir here
-data_dir = ''
+data_dir = '../datasets/speech-data/emodb'
 dataset = EmodbDataset(root=data_dir)
 
 extractor = Wav2Vec2FeatureExtractor.from_pretrained('superb/wav2vec2-base-superb-er') # for ER
